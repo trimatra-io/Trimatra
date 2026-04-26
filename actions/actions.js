@@ -1,0 +1,226 @@
+"use server";
+import { authOptions } from "@/app/api/auth/[...nextauth]/route";
+import { PrismaClient } from "@prisma/client";
+import { getServerSession } from "next-auth";
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+const prisma = new PrismaClient();
+
+
+export const fetchNews = async () => {
+    const newspg = await prisma.news.findMany({});
+    return newspg
+}
+
+
+export const fetchSingleNews = async (id) => {
+    const newspg = await prisma.news.findFirst({
+        where: {
+            id: id
+        }
+    });
+    return newspg
+}
+
+
+
+export const addNews = async (formData) => {
+
+    // collect info from form using formData
+    const imageUrl = formData.get('imageUrl');
+    const title = formData.get('title');
+    const category = formData.get('category');
+    const description = formData.get('description');
+
+    // session to get the current logged in user info
+
+    const session = await getServerSession(authOptions);
+
+    // only admin can add blog
+    if (session?.user?.role === 'ADMIN' || session?.user?.permissions?.includes('CREATE_NEWS')) {
+
+        // push the data into the DB
+        const new_news = await prisma.news.create({
+            data: {
+                imageUrl: imageUrl ? imageUrl : null,
+                title,
+                category,
+                description,
+                authorId: session?.user?.id
+            }
+        })
+
+        revalidatePath('/news/add-news')
+        redirect('/')
+    }
+
+
+}
+
+// Update a Blog
+
+export const updateNews = async (id, formData) => {
+
+    // collect info from form using formData
+    const imageUrl = formData.get('imageUrl');
+    const title = formData.get('title');
+    const category = formData.get('category');
+    const description = formData.get('description');
+
+    // session 
+
+    const session = await getServerSession(authOptions);
+
+    // only admin can add blog
+    if (session?.user?.role === 'ADMIN' || session?.user?.permissions?.includes('EDIT_NEWS')) {
+        // push the data into the DB
+        const updated_news = await prisma.news.update({
+            where: {
+                id: id,
+            },
+            data: {
+                imageUrl: imageUrl ? imageUrl : null,
+                title,
+                category,
+                description,
+                authorId: session?.user?.id
+            }
+        })
+
+        revalidatePath(`/news/update-news/${id}`)
+        redirect('/news')
+
+    } else {
+        console.log('Not Possible!')
+    }
+
+
+
+}
+
+
+// // add Comment to a blog
+// export const addCommentToBlog = async (blogId, formData) => {
+//     // collect info from form using formData
+//     const text = formData.get('text');
+
+//     // session
+
+//     const session = await getServerSession(authOptions);
+
+//     // push the data into the DB
+//     const added_comment = await prisma.comment.create({
+//         data: {
+//             authorId: session?.user?.id,
+//             blogId: blogId,
+//             text: text
+//         }
+//     })
+//     revalidatePath(`/blogs/${blogId}`)
+//     redirect(`/blogs/${blogId}`)
+// }
+
+
+
+
+// // fetching all comments
+// export const fetchComments = async (blogId) => {
+
+//     //const skip = (page - 1) * pageSize
+
+//     const comments = await prisma.comment.findMany({
+//         where: {
+//             blogId: blogId
+//         },
+//         orderBy: {
+//             createdAt: 'desc'
+//         },
+//         take: 5, // pagination
+//     })
+
+//     return comments
+
+// }
+
+// // delete Comment by Id and blogId
+
+
+// export const deleteComment = async (commentId, blogId) => {
+
+//     // only auther of this comment can delete it!
+
+//     const session = await getServerSession(authOptions);
+
+//     // comment of autherId
+
+//     const commentData = await prisma.comment.findFirst({
+//         where: {
+//             id: commentId
+//         }
+//     })
+
+
+//     if (session?.user?.id === commentData?.authorId) {
+//         await prisma.comment.delete({
+//             where: {
+//                 id: commentId
+//             }
+//         })
+
+//         revalidatePath(`/blogs/${blogId}`)
+//     } else {
+//         console.log('You Are Not Authorize to Delete This Comment!');
+//     }
+
+// }
+
+
+// fetch users
+
+// export const fetchUsers = async () => {
+//     const users = await prisma.user.findMany({
+//         take: 5
+//     })
+
+//     return users
+
+// }
+
+// assign user to a particular role from admin panel
+
+export const assignPermission = async (userId, formData) => {
+
+    const permission_name = formData.get('permission_name');
+
+    // session 
+    const session = await getServerSession(authOptions);
+
+    // only admin can add blog
+    if (session?.user?.role === 'ADMIN') {
+
+        // asssign some permission to user by admin
+        const assigned_user = await prisma.user.update({
+            where: {
+                id: userId,
+            },
+
+            data: {
+                permissions: {
+                    push: permission_name
+                }
+
+            }
+
+        })
+        revalidatePath(`/dashboard`)
+        redirect(`/dashboard`)
+
+    }
+
+
+
+}
+
+
+
+
