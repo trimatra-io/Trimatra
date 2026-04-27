@@ -34,7 +34,7 @@ const founder = [
   },
   {
     name: "Ardi Rudini",
-    link: "https://ardi.trimatra.io",
+    link: "https://ardigamedev.com",
     image: "/team/Ardi.png",
     position: "Founder",
     socials: [
@@ -60,7 +60,7 @@ const founder = [
 const teams = [
   {
     name: "Melisa",
-    link: "https://melisa.trimatra.io",
+    link: "#",
     image: "/team/Melisa.png",
     position: "CFO",
     socials: [
@@ -83,7 +83,7 @@ const teams = [
   },
   {
     name: "Jaelani",
-    link: "https://jael.trimatra.io",
+    link: "#",
     image: "/team/Jael.png",
     position: "Lead 3D Artist",
     socials: [
@@ -106,7 +106,7 @@ const teams = [
   },
   {
     name: "Ichsan Ridho F",
-    link: "https://ichsan.trimatra.io",
+    link: "#",
     image: "/team/Ichsan.png",
     position: "3D Artist",
     socials: [
@@ -129,7 +129,7 @@ const teams = [
   },
   {
     name: "Firman Asyiraz",
-    link: "https://firman.trimatra.io",
+    link: "#",
     image: "/team/Firman.png",
     position: "3D Artist",
     socials: [
@@ -152,7 +152,7 @@ const teams = [
   },
   {
     name: "Maula Ibnu H",
-    link: "https://maula.trimatra.io",
+    link: "#",
     image: "/team/Maula.png",
     position: "2D Artist",
     socials: [
@@ -175,7 +175,7 @@ const teams = [
   },
   {
     name: "RAFSANDI",
-    link: "https://rafly.trimatra.io",
+    link: "https://rafsandi.id",
     image: "/team/Rafly.png",
     position: "Community Manager",
     socials: [
@@ -198,7 +198,7 @@ const teams = [
   },
   {
     name: "Reno",
-    link: "https://reno.trimatra.io",
+    link: "#",
     image: "/team/Reno.png",
     position: "Illustrator",
     socials: [
