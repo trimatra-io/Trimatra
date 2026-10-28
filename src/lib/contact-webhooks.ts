@@ -1,9 +1,9 @@
 export type ContactTarget = "business" | "support" | "careers";
 
 const contactWebhookMap: Record<ContactTarget, string | undefined> = {
-  business: process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_BUSINESS,
-  support: process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_SUPPORT,
-  careers: process.env.NEXT_PUBLIC_DISCORD_WEBHOOK_CAREERS,
+  business: process.env.DISCORD_WEBHOOK_BUSINESS,
+  support: process.env.DISCORD_WEBHOOK_SUPPORT,
+  careers: process.env.DISCORD_WEBHOOK_CAREERS,
 };
 
 export function getContactWebhook(target: ContactTarget) {
@@ -14,4 +14,8 @@ export function getContactWebhook(target: ContactTarget) {
   }
 
   return webhook;
+}
+
+export function isContactTarget(value: string): value is ContactTarget {
+  return value === "business" || value === "support" || value === "careers";
 }

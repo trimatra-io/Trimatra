@@ -28,7 +28,7 @@ const founder = [
       {
         name: "Email",
         icon: <FiMail />,
-        link: "mailto:aldi@trimatra.io",
+        link: "mailto:aldideveloper@gmail.com",
       },
     ],
   },
@@ -51,7 +51,7 @@ const founder = [
       {
         name: "Email",
         icon: <FiMail />,
-        link: "mailto:ardi@trimatra.io",
+        link: "mailto:ardideveloper@gmail.com",
       },
     ],
   },
@@ -77,7 +77,7 @@ const teams = [
       {
         name: "Email",
         icon: <FiMail />,
-        link: "mailto:melisa@trimatra.io",
+        link: "mailto:#",
       },
     ],
   },
@@ -192,7 +192,7 @@ const teams = [
       {
         name: "Email",
         icon: <FiMail />,
-        link: "mailto:rafsandi@trimatra.io",
+        link: "mailto:rafsandi.b2b@gmail.com",
       },
     ],
   },

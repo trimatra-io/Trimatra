@@ -47,7 +47,7 @@ export const gamecard = [
     link: "/project/death-paths",
     icongame: "/games/Icons/tdp.png",
     namegame: "The Death Paths",
-    category: "Unity", // Contoh untuk Roblox
+    category: "Unreal Engine", // Contoh untuk Roblox
   },
   {
     id: 8,

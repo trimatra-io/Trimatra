@@ -30,27 +30,41 @@ const ReportBugForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    const webhookUrl =
-      "https://discord.com/api/webhooks/1278641647839608875/PSBJjJJPL3CH-_GJPFUbfymL6XmubNfi8pqLYHGP5foHPtOcrt9pgjJlD3Ujc8bk6vOj";
+    const tokenRes = await fetch("/api/form-token?form=report-bug", {
+      method: "GET",
+      cache: "no-store",
+    });
+
+    if (!tokenRes.ok) {
+      alert("Error validating form. Please try again.");
+      return;
+    }
+
+    const tokenBody = (await tokenRes.json()) as { token?: string };
+    if (!tokenBody.token) {
+      alert("Error validating form. Please try again.");
+      return;
+    }
 
     const formDataToSend = new FormData();
+    formDataToSend.append("signature", tokenBody.token);
     formDataToSend.append("username", formData.username);
-    formDataToSend.append(
-      "content",
-      `Email: ${formData.email}\nGame: ${formData.ourgame}\nMessage: ${formData.message}\n`
-    );
+    formDataToSend.append("email", formData.email);
+    formDataToSend.append("ourgame", formData.ourgame);
+    formDataToSend.append("message", formData.message);
 
     // Append selected files to formData
     if (files) {
-      Array.from(files).forEach((file) => {
-        formDataToSend.append("file", file); // Discord only supports one file per request
-      });
+      const firstFile = Array.from(files)[0];
+      if (firstFile) {
+        formDataToSend.append("file", firstFile);
+      }
     }
 
     try {
-      const res = await fetch(webhookUrl as string, {
+      const res = await fetch("/api/report-bug", {
         method: "POST",
-        body: formDataToSend, // Send the FormData instead of JSON
+        body: formDataToSend,
       });
 
       if (!res.ok) {

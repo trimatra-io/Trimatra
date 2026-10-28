@@ -12,7 +12,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { BriefcaseBusiness, Headset, GraduationCap, ImageUp, Link2 } from "lucide-react";
 import { motion } from "motion/react";
-import { getContactWebhook, type ContactTarget } from "@/lib/contact-webhooks";
+
+type ContactTarget = "business" | "support" | "careers";
 
 const contactTargets = [
   {
@@ -47,6 +48,7 @@ export default function ContactPage() {
   const messageRef = useRef<HTMLTextAreaElement>(null);
   const portfolioRef = useRef<HTMLInputElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
+  const websiteRef = useRef<HTMLInputElement>(null);
 
   const activeTarget =
     contactTargets.find((t) => t.value === selectedTarget) ?? contactTargets[0];
@@ -55,55 +57,49 @@ export default function ContactPage() {
     event.preventDefault();
     setSendStatus("sending");
 
-    const webhookUrl = getContactWebhook(selectedTarget);
-
     const name = nameRef.current?.value ?? "";
     const email = emailRef.current?.value ?? "";
     const subject = subjectRef.current?.value ?? "";
     const message = messageRef.current?.value ?? "";
     const portfolio = portfolioRef.current?.value ?? "";
+    const website = websiteRef.current?.value ?? "";
     const file = fileRef.current?.files?.[0];
 
-    const colorMap: Record<ContactTarget, number> = {
-      business: 0x3b82f6, // blue-500
-      support: 0xf59e0b,  // amber-500
-      careers: 0x22c55e,  // green-500
-    };
-
-    const fields: { name: string; value: string; inline?: boolean }[] = [
-      { name: "Nama", value: name, inline: true },
-      { name: "Email", value: email, inline: true },
-      { name: "Subject", value: subject },
-      { name: "Pesan", value: message },
-    ];
-
-    if (portfolio) {
-      fields.splice(2, 0, { name: "Portfolio", value: portfolio });
-    }
-
-    const embed = {
-      title: `📬 Kontak Baru — ${activeTarget.label}`,
-      color: colorMap[selectedTarget],
-      fields,
-      footer: { text: "Trimatra Studio · Contact Router" },
-      timestamp: new Date().toISOString(),
-    };
-
     try {
-      // 1. Kirim embed via JSON
-      const embedRes = await fetch(webhookUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ embeds: [embed] }),
+      const tokenRes = await fetch("/api/form-token?form=contact", {
+        method: "GET",
+        cache: "no-store",
       });
-      if (!embedRes.ok) throw new Error("Webhook embed error");
+      if (!tokenRes.ok) {
+        throw new Error("token-error");
+      }
 
-      // 2. Jika ada file, kirim sebagai follow-up attachment
+      const tokenBody = (await tokenRes.json()) as { token?: string };
+      if (!tokenBody.token) {
+        throw new Error("token-error");
+      }
+
+      const formData = new FormData();
+      formData.append("signature", tokenBody.token);
+      formData.append("target", selectedTarget);
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("subject", subject);
+      formData.append("message", message);
+      formData.append("portfolio", portfolio);
+      formData.append("website", website);
+
       if (file) {
-        const formData = new FormData();
-        formData.append("content", `📎 Lampiran dari **${name}**`);
         formData.append("file", file);
-        await fetch(webhookUrl, { method: "POST", body: formData });
+      }
+
+      const sendRes = await fetch("/api/contact", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!sendRes.ok) {
+        throw new Error("send-error");
       }
 
       setSendStatus("success");
@@ -182,6 +178,15 @@ export default function ContactPage() {
                 </DialogHeader>
 
                 <form className="grid gap-4" onSubmit={handleSubmit}>
+                  <input
+                    ref={websiteRef}
+                    type="text"
+                    name="website"
+                    autoComplete="off"
+                    tabIndex={-1}
+                    aria-hidden="true"
+                    className="hidden"
+                  />
                   <div className="grid gap-4 md:grid-cols-2">
                     <label className="space-y-2 text-sm">
                       <span className="font-medium text-zinc-200">Name</span>
